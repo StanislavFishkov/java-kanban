@@ -1,4 +1,4 @@
-package kanban;
+import kanban.*;
 
 public class Main {
 
@@ -9,7 +9,7 @@ public class Main {
         taskManager.addTask(task1);
 
         Task task2 = new Task();
-        task2.name = "Помыть посуду";
+        task2.setName("Помыть посуду");
         taskManager.addTask(task2);
 
         Epic epic1 = new Epic("Спринт 4", "Пройти полностью 4-й спринт на Яндекс.Практикум.");
@@ -20,11 +20,11 @@ public class Main {
         taskManager.addSubtask(subtask2);
 
         Epic epic2 = new Epic();
-        epic2.name = "Покупки";
-        epic2.description = "Купить еду и моющие средства.";
+        epic2.setName("Покупки");
+        epic2.setDescription("Купить еду и моющие средства.");
         Subtask subtask3 = new Subtask(epic2);
-        subtask3.name = "Список покупок";
-        subtask3.description = "Составить подробный список покупок.";
+        subtask3.setName("Список покупок");
+        subtask3.setDescription("Составить подробный список покупок.");
         taskManager.addEpic(epic2);
         taskManager.addSubtask(subtask3);
 
@@ -34,13 +34,13 @@ public class Main {
         System.out.println(taskManager.getSubtasks());
 
         System.out.println("----Вывод 2-----");
-        Task updateTask1 = new Task(task1.getId(), TaskStatus.DONE, task1.name, task1.description);
+        Task updateTask1 = new Task(task1.getId(), TaskStatus.DONE, task1.getName(), task1.getDescription());
         taskManager.updateTask(updateTask1);
 
-        Subtask updateSubtask1 = new Subtask(subtask1.getId(), TaskStatus.DONE, subtask1.name, subtask1.description, epic2);
+        Subtask updateSubtask1 = new Subtask(subtask1.getId(), TaskStatus.DONE, subtask1.getName(), subtask1.getDescription(), epic2);
         taskManager.updateSubtask(updateSubtask1);
 
-        Epic updateEpic1 = new Epic(epic1.getId(), epic1.name + "!", epic1.description);
+        Epic updateEpic1 = new Epic(epic1.getId(), epic1.getName() + "!", epic1.getDescription());
         taskManager.updateEpic(updateEpic1);
 
         System.out.println(taskManager.getTasks());

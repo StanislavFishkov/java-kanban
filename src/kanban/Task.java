@@ -5,8 +5,8 @@ import java.util.Objects;
 public class Task {
     private Integer id;
     private TaskStatus status;
-    public String name;
-    public String description;
+    private String name;
+    private String description;
 
     public Task() {
         this.status = TaskStatus.NEW;
@@ -32,7 +32,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id;
+        return Objects.equals(id, task.id);
     }
 
     @Override
@@ -58,6 +58,14 @@ public class Task {
         return status;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     protected void setId(int id) {
         this.id = id;
     }
@@ -66,4 +74,11 @@ public class Task {
         this.status = status;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

@@ -17,15 +17,15 @@ public class TaskManager {
     }
 
     public ArrayList<Task> getTasks() {
-        return new ArrayList<Task>(tasks.values());
+        return new ArrayList<>(tasks.values());
     }
 
     public ArrayList<Subtask> getSubtasks() {
-        return new ArrayList<Subtask>(subtasks.values());
+        return new ArrayList<>(subtasks.values());
     }
 
     public ArrayList<Epic> getEpics() {
-        return new ArrayList<Epic>(epics.values());
+        return new ArrayList<>(epics.values());
     }
 
     private void calculateEpicStatus(Epic epic) {
