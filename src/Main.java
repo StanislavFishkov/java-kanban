@@ -3,7 +3,9 @@ import kanban.*;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = Managers.getDefault();
+
+        System.out.println("History (size " + taskManager.getHistory().size() + "): "+ taskManager.getHistory());
 
         Task task1 = new Task("Прогулка", "Необходимо пройти больше 10 000 шагов.");
         taskManager.addTask(task1);
@@ -19,19 +21,24 @@ public class Main {
         Subtask subtask2 = new Subtask("Финальное задание", "Сдать финальное задание спринта 4.", epic1);
         taskManager.addSubtask(subtask2);
 
+        System.out.println("History (size " + taskManager.getHistory().size() + "): "+ taskManager.getHistory());
+
         Epic epic2 = new Epic();
         epic2.setName("Покупки");
         epic2.setDescription("Купить еду и моющие средства.");
+        taskManager.addEpic(epic2);
         Subtask subtask3 = new Subtask(epic2);
         subtask3.setName("Список покупок");
         subtask3.setDescription("Составить подробный список покупок.");
-        taskManager.addEpic(epic2);
         taskManager.addSubtask(subtask3);
 
         System.out.println("----Вывод 1-----");
         System.out.println(taskManager.getTasks());
         System.out.println(taskManager.getEpics());
         System.out.println(taskManager.getSubtasks());
+        System.out.println(taskManager.getEpicSubtasks(epic1));
+
+        System.out.println("History (size " + taskManager.getHistory().size() + "): "+ taskManager.getHistory());
 
         System.out.println("----Вывод 2-----");
         Task updateTask1 = new Task(task1.getId(), TaskStatus.DONE, task1.getName(), task1.getDescription());
@@ -46,6 +53,9 @@ public class Main {
         System.out.println(taskManager.getTasks());
         System.out.println(taskManager.getEpics());
         System.out.println(taskManager.getSubtasks());
+        System.out.println(taskManager.getEpicSubtasks(epic1));
+
+        System.out.println("History (size " + taskManager.getHistory().size() + "): "+ taskManager.getHistory());
 
         System.out.println("----Вывод 3-----");
         taskManager.deleteTask(task2.getId());
@@ -57,5 +67,7 @@ public class Main {
         System.out.println(taskManager.getSubtasks());
 
         System.out.println(taskManager.getEpicSubtasks(epic2));
+
+        System.out.println("History (size " + taskManager.getHistory().size() + "): "+ taskManager.getHistory());
     }
 }
