@@ -1,4 +1,6 @@
-package kanban;
+package kanban.service;
+
+import kanban.model.*;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package kanban;
+package kanban.model;
 
 public class Subtask extends Task {
     public final Integer epic;

@@ -1,4 +1,4 @@
-package kanban;
+package kanban.model;
 
 import java.util.Objects;
 
@@ -73,11 +73,11 @@ public class Task {
         return description;
     }
 
-    protected void setId(int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    protected void setStatus(TaskStatus status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
     }
 

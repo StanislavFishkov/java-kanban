@@ -1,4 +1,4 @@
-package kanban;
+package kanban.model;
 
 public enum TaskStatus {
     NEW,

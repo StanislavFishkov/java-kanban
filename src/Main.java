@@ -1,4 +1,5 @@
-import kanban.*;
+import kanban.model.*;
+import kanban.service.*;
 
 public class Main {
 

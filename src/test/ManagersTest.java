@@ -1,5 +1,6 @@
-import kanban.*;
-
+import kanban.service.HistoryManager;
+import kanban.service.Managers;
+import kanban.service.TaskManager;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

@@ -1,4 +1,4 @@
-package kanban;
+package kanban.model;
 
 import java.util.ArrayList;
 
@@ -36,4 +36,11 @@ public class Epic extends Task {
                 '}';
     }
 
+    public ArrayList<Integer> getSubtasks() {
+        return subtasks;
+    }
+
+    public void setSubtasks(ArrayList<Integer> subtasks) {
+        this.subtasks = subtasks;
+    }
 }

@@ -1,4 +1,6 @@
-package kanban;
+package kanban.service;
+
+import kanban.model.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,12 +22,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void calculateEpicStatus(Epic epic) {
-        if (epic.subtasks.isEmpty()) {
+        if (epic.getSubtasks().isEmpty()) {
             epic.setStatus(TaskStatus.NEW);
             return;
         }
         TaskStatus calculatedStatus = null;
-        for (Integer id : epic.subtasks) {
+        for (Integer id : epic.getSubtasks()) {
             TaskStatus status = getSubtask(id).getStatus();
             if (status == TaskStatus.IN_PROGRESS) {
                 calculatedStatus = TaskStatus.IN_PROGRESS;
@@ -64,7 +66,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllSubtasks() {
         for (Epic epic : epics.values()) {
-            epic.subtasks.clear();
+            epic.getSubtasks().clear();
             calculateEpicStatus(epic);
         }
         subtasks.clear();
@@ -113,15 +115,15 @@ public class InMemoryTaskManager implements TaskManager {
 
         subtask.setId(++idCounter);
         subtasks.put(idCounter, subtask);
-        epic.subtasks.add(subtask.getId());
+        epic.getSubtasks().add(subtask.getId());
         calculateEpicStatus(epic);
         return subtask;
     }
 
     @Override
     public Epic addEpic(Epic epic) {
-        if (!epic.subtasks.isEmpty()) {
-            epic.subtasks.clear();
+        if (!epic.getSubtasks().isEmpty()) {
+            epic.getSubtasks().clear();
         }
         epic.setId(++idCounter);
         epics.put(idCounter, epic);
@@ -157,9 +159,9 @@ public class InMemoryTaskManager implements TaskManager {
         // У подзадачи мог измениться эпик. В этом случае требуются дополнительные действия.
         if (!subtask.epic.equals(oldSubtask.epic)) {
             Epic oldEpic = getEpic(oldSubtask.epic);
-            oldEpic.subtasks.remove(oldSubtask.getId());
+            oldEpic.getSubtasks().remove(oldSubtask.getId());
             calculateEpicStatus(oldEpic);
-            epic.subtasks.add(subtask.getId());
+            epic.getSubtasks().add(subtask.getId());
         }
         subtasks.put(subtask.getId(), subtask);
         calculateEpicStatus(epic);
@@ -174,7 +176,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         // Перенесем список привязанных подзадач в новый инстанс эпика.
-        epic.subtasks = getEpic(epic.getId()).subtasks;
+        epic.setSubtasks(getEpic(epic.getId()).getSubtasks());
         epics.put(epic.getId(), epic);
         calculateEpicStatus(epic);
         return epic;
@@ -189,14 +191,14 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteSubtask(Integer id) {
         Subtask subtask = getSubtask(id);
         Epic epic = getEpic(subtask.epic);
-        epic.subtasks.remove(id);
+        epic.getSubtasks().remove(id);
         subtasks.remove(id);
         calculateEpicStatus(epic);
     }
 
     @Override
     public void deleteEpic(Integer id) {
-        for (Integer subtaskId : getEpic(id).subtasks) {
+        for (Integer subtaskId : getEpic(id).getSubtasks()) {
             subtasks.remove(subtaskId);
         }
         epics.remove(id);
@@ -205,7 +207,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public ArrayList<Subtask> getEpicSubtasks(Epic epic) {
         ArrayList<Subtask> epicSubtasks = new ArrayList<>();
-        for (Integer id : epic.subtasks) {
+        for (Integer id : epic.getSubtasks()) {
             epicSubtasks.add(getSubtask(id));
         }
         return epicSubtasks;

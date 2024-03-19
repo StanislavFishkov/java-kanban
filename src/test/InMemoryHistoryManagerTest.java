@@ -1,7 +1,7 @@
-import kanban.*;
-
 import java.util.List;
 
+import kanban.model.Task;
+import kanban.service.InMemoryHistoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

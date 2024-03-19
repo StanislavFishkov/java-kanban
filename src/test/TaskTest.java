@@ -1,5 +1,5 @@
-import kanban.*;
-
+import kanban.model.Task;
+import kanban.model.TaskStatus;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
