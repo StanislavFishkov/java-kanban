@@ -2,7 +2,8 @@ package kanban;
 
 import java.util.ArrayList;
 
-interface HistoryManager {
+public interface HistoryManager {
     void add(Task task);
+
     ArrayList<Task> getHistory();
 }

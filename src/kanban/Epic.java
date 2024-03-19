@@ -20,6 +20,11 @@ public class Epic extends Task {
         this.subtasks = new ArrayList<>();
     }
 
+    public Epic(Epic epic) {
+        super(epic);
+        this.subtasks = new ArrayList<>(epic.subtasks);
+    }
+
     @Override
     public String toString() {
         return "Epic{" +

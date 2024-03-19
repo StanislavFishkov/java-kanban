@@ -41,7 +41,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-
     @Override
     public ArrayList<Task> getTasks() {
         return new ArrayList<>(tasks.values());
@@ -99,37 +98,63 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addTask(Task task) {
+    public Task addTask(Task task) {
         task.setId(++idCounter);
         tasks.put(idCounter, task);
+        return task;
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
+    public Subtask addSubtask(Subtask subtask) {
+        Epic epic = getEpic(subtask.epic);
+        if (epic == null) {
+            return null;
+        }
+
         subtask.setId(++idCounter);
         subtasks.put(idCounter, subtask);
-
-        Epic epic = getEpic(subtask.epic);
         epic.subtasks.add(subtask.getId());
         calculateEpicStatus(epic);
+        return subtask;
     }
 
     @Override
-    public void addEpic(Epic epic) {
+    public Epic addEpic(Epic epic) {
+        if (!epic.subtasks.isEmpty()) {
+            epic.subtasks.clear();
+        }
         epic.setId(++idCounter);
         epics.put(idCounter, epic);
+        return epic;
     }
 
     @Override
-    public void updateTask(Task task) {
+    public Task updateTask(Task task) {
+        Task oldTask = getTask(task.getId());
+        if (oldTask == null) {
+            return null;
+        }
         tasks.put(task.getId(), task);
+        return task;
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
+    public Subtask updateSubtask(Subtask subtask) {
         Subtask oldSubtask = getSubtask(subtask.getId());
-        // У подзадачи мог измениться эпик. В этом случае требуются дополнительные действия.
+        if (oldSubtask == null) {
+            return null;
+        }
+
         Epic epic = getEpic(subtask.epic);
+        if (epic == null) {
+            return null;
+        }
+
+        if (subtask.getId().equals(subtask.epic)) {
+            return null;
+        }
+
+        // У подзадачи мог измениться эпик. В этом случае требуются дополнительные действия.
         if (!subtask.epic.equals(oldSubtask.epic)) {
             Epic oldEpic = getEpic(oldSubtask.epic);
             oldEpic.subtasks.remove(oldSubtask.getId());
@@ -138,14 +163,21 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subtasks.put(subtask.getId(), subtask);
         calculateEpicStatus(epic);
+        return subtask;
     }
 
     @Override
-    public void updateEpic(Epic epic) {
+    public Epic updateEpic(Epic epic) {
+        Epic oldEpic = getEpic(epic.getId());
+        if (oldEpic == null) {
+            return null;
+        }
+
         // Перенесем список привязанных подзадач в новый инстанс эпика.
         epic.subtasks = getEpic(epic.getId()).subtasks;
         epics.put(epic.getId(), epic);
         calculateEpicStatus(epic);
+        return epic;
     }
 
     @Override

@@ -9,12 +9,25 @@ public class InMemoryHistoryManager implements HistoryManager {
         this.history = new ArrayList<>();
     }
 
+    private Task copy(Task task) {
+        if (task instanceof Subtask) {
+            return new Subtask((Subtask) task);
+        } else if (task instanceof Epic) {
+            return new Epic((Epic) task);
+        } else {
+            return new Task(task);
+        }
+    }
+
     @Override
     public void add(Task task) {
+        if (task == null) {
+            return;
+        }
         if (history.size() == 10) {
             history.removeFirst();
         }
-        history.add(task);
+        history.add(copy(task));
     }
 
     @Override

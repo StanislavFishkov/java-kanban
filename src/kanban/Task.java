@@ -27,6 +27,13 @@ public class Task {
         this.description = description;
     }
 
+    public Task(Task task) {
+        this.id = task.getId();
+        this.status = task.getStatus();
+        this.name = task.getName();
+        this.description = task.getDescription();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
