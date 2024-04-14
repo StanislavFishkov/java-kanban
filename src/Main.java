@@ -14,6 +14,7 @@ public class Main {
         Task task2 = new Task();
         task2.setName("Помыть посуду");
         taskManager.addTask(task2);
+        taskManager.getTask(task2.getId());
 
         Epic epic1 = new Epic("Спринт 4", "Пройти полностью 4-й спринт на Яндекс.Практикум.");
         taskManager.addEpic(epic1);
@@ -22,6 +23,7 @@ public class Main {
         Subtask subtask2 = new Subtask("Финальное задание", "Сдать финальное задание спринта 4.", epic1.getId());
         taskManager.addSubtask(subtask2);
 
+        taskManager.getTask(task2.getId());
         System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
 
         Epic epic2 = new Epic();
