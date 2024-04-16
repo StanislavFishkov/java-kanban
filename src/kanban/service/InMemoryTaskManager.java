@@ -58,8 +58,15 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(epics.values());
     }
 
+    private void clearHistory(HashMap<Integer, ? extends Task> tasksToRemove) {
+        for (Integer id : tasksToRemove.keySet()) {
+            historyManager.remove(id);
+        }
+    }
+
     @Override
     public void deleteAllTasks() {
+        clearHistory(tasks);
         tasks.clear();
     }
 
@@ -69,12 +76,15 @@ public class InMemoryTaskManager implements TaskManager {
             epic.getSubtasks().clear();
             calculateEpicStatus(epic);
         }
+        clearHistory(subtasks);
         subtasks.clear();
     }
 
     @Override
     public void deleteAllEpics() {
+        clearHistory(subtasks);
         subtasks.clear();
+        clearHistory(epics);
         epics.clear();
     }
 

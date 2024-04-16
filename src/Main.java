@@ -72,5 +72,17 @@ public class Main {
         System.out.println(taskManager.getEpicSubtasks(epic2));
 
         System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+
+        System.out.println("----Вывод 4-----");
+        taskManager.deleteAllTasks();
+        System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+
+        System.out.println("----Вывод 5-----");
+        taskManager.deleteAllSubtasks();
+        System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+
+        System.out.println("----Вывод 6-----");
+        taskManager.deleteAllEpics();
+        System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
     }
 }
