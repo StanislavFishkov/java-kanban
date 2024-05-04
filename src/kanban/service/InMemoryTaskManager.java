@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    private Integer idCounter;
-    private final HashMap<Integer, Task> tasks;
-    private final HashMap<Integer, Subtask> subtasks;
-    private final HashMap<Integer, Epic> epics;
+    protected Integer idCounter;
+    protected final HashMap<Integer, Task> tasks;
+    protected final HashMap<Integer, Subtask> subtasks;
+    protected final HashMap<Integer, Epic> epics;
     private final HistoryManager historyManager;
 
 
@@ -41,7 +41,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
         epic.setStatus(calculatedStatus);
     }
-
 
     @Override
     public ArrayList<Task> getTasks() {

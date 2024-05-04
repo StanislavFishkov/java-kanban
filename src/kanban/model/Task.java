@@ -88,4 +88,8 @@ public class Task {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public TaskTypes getTaskType() {
+        return TaskTypes.TASK;
+    }
 }
