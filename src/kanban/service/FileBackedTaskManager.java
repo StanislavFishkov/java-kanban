@@ -1,14 +1,13 @@
 package kanban.service;
 
+import kanban.exception.ManagerSaveException;
 import kanban.model.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
-    private static final String DELIMITER = ",";
     private final File file;
 
     @Override
@@ -93,52 +92,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return file;
     }
 
-    static class ManagerSaveException extends RuntimeException {
-        public ManagerSaveException(String message) {
-            super(message);
-        }
-
-        public ManagerSaveException(Throwable cause) {
-            super(cause);
-        }
-    }
-
     public FileBackedTaskManager(File file) {
         super();
         this.file = file;
     }
 
-    static String toString(Task task) {
-        LinkedList<String> strings = new LinkedList<>();
-        strings.add(task.getId().toString());
-        strings.add(task.getTaskType().name());
-        strings.add(task.getName());
-        strings.add(task.getStatus().name());
-        strings.add(task.getDescription());
-        if (task.getTaskType() == TaskTypes.SUBTASK) {
-            strings.add(((Subtask) task).epic.toString());
-        } else {
-            strings.add("");
-        }
-        return String.join(DELIMITER, strings);
-    }
 
-    static Task fromString(String value) {
-        Task task;
-        String[] strings = value.split(DELIMITER);
-        int id = Integer.parseInt(strings[0]);
-        TaskTypes taskType = TaskTypes.valueOf(strings[1]);
-        String name = strings[2];
-        TaskStatus taskStatus = TaskStatus.valueOf(strings[3]);
-        String description = strings[4];
-        switch (taskType) {
-            case TASK -> task = new Task(id, taskStatus, name, description);
-            case EPIC -> task = new Epic(id, taskStatus, name, description);
-            case SUBTASK -> task = new Subtask(id, taskStatus, name, description, Integer.parseInt(strings[5]));
-            default -> task = null;
-        }
-        return task;
-    }
 
     private void save() {
         // create folder if it doesn't exist
@@ -155,15 +114,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             bufferedWriter.write("id,type,name,status,description,epic");
             for (Task task : getTasks()) {
                 bufferedWriter.newLine();
-                bufferedWriter.write(toString(task));
+                bufferedWriter.write(TaskParser.taskToString(task));
             }
             for (Epic epic : getEpics()) {
                 bufferedWriter.newLine();
-                bufferedWriter.write(toString(epic));
+                bufferedWriter.write(TaskParser.taskToString(epic));
             }
             for (Subtask subtask : getSubtasks()) {
                 bufferedWriter.newLine();
-                bufferedWriter.write(toString(subtask));
+                bufferedWriter.write(TaskParser.taskToString(subtask));
             }
         } catch (IOException exception) {
             throw new ManagerSaveException(exception);
@@ -180,7 +139,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 Integer maxId = 0;
                 while (bufferedReader.ready()) {
                     String line = bufferedReader.readLine();
-                    Task task = fromString(line);
+                    Task task = TaskParser.taskFromString(line);
                     if (task.getId() > maxId) {
                         maxId = task.getId();
                     }
