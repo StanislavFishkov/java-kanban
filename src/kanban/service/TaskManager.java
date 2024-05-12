@@ -3,6 +3,7 @@ package kanban.service;
 import kanban.model.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     ArrayList<Task> getTasks();
@@ -44,4 +45,6 @@ public interface TaskManager {
     ArrayList<Subtask> getEpicSubtasks(Epic epic);
 
     ArrayList<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }

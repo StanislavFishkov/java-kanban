@@ -5,6 +5,8 @@ import kanban.model.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
@@ -97,8 +99,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         this.file = file;
     }
 
-
-
     private void save() {
         // create folder if it doesn't exist
         if (!file.exists()) {
@@ -111,7 +111,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            bufferedWriter.write("id,type,name,status,description,epic");
+            bufferedWriter.write(TaskParser.getHeader());
             for (Task task : getTasks()) {
                 bufferedWriter.newLine();
                 bufferedWriter.write(TaskParser.taskToString(task));
@@ -133,7 +133,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
         if (file.exists()) {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-                // skip title
+                // skip header
                 bufferedReader.readLine();
 
                 Integer maxId = 0;
@@ -154,10 +154,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 throw new ManagerSaveException(exception);
             }
 
+            fileBackedTaskManager.getTasks().
+                    forEach(fileBackedTaskManager::addToSortedTasks);
+
             // fill in list of subtasks' ids into its epics
             for (Subtask subtask : fileBackedTaskManager.getSubtasks()) {
                 Epic epic = fileBackedTaskManager.epics.get(subtask.epic);
                 epic.getSubtasks().add(subtask.getId());
+                fileBackedTaskManager.addToSortedTasks(subtask);
             }
         }
         return fileBackedTaskManager;
@@ -172,12 +176,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
         TaskManager taskManager1 = new FileBackedTaskManager(file);
 
-        taskManager1.addTask(new Task("Task1", "Task1"));
+        taskManager1.addTask(new Task("Task1", "Task1"
+                , LocalDateTime.of(2024, 5, 10, 15, 34), Duration.ofMinutes(90)));
         taskManager1.addTask(new Task("Task2", "Task2"));
         Epic epic1 = new Epic("Epic1", "Epic1");
-        taskManager1.addTask(epic1);
-        taskManager1.addTask(new Epic("Epic2", "Epic2"));
+        taskManager1.addEpic(epic1);
+        taskManager1.addEpic(new Epic("Epic2", "Epic2"));
         taskManager1.addSubtask(new Subtask("Subtask1", "Subtask1", epic1.getId()));
+
+        Subtask subtask2 = new Subtask("Subtask2", "Subtask2", epic1.getId());
+        subtask2.setStartTime(LocalDateTime.of(2024, 6, 1, 12, 0));
+        subtask2.setDuration(Duration.ofMinutes(90));
+        taskManager1.addSubtask(subtask2);
+
+        Subtask subtask3 = new Subtask("Subtask3", "Subtask3", epic1.getId());
+        subtask3.setStartTime(LocalDateTime.of(2024, 4, 7, 10, 0));
+        subtask3.setDuration(Duration.ofMinutes(24 * 60));
+        taskManager1.addSubtask(subtask3);
 
         // check all tasks exist in a new TaskManager, when loaded from file
         TaskManager taskManager2 = FileBackedTaskManager.loadFromFile(file);
@@ -196,6 +211,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 throw new ManagerSaveException("Ошибка при восстановлении из файла: списки задач не идентичны.");
             }
         }
-        System.out.printf("Восстановление из файла %s прошло успешно: списки задач идентичны.", file);
+        System.out.printf("Восстановление из файла %s прошло успешно: списки задач идентичны.%n", file);
+        System.out.println(taskManager2.getPrioritizedTasks());
     }
 }
