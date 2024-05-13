@@ -1,19 +1,18 @@
 import kanban.model.*;
 import kanban.service.FileBackedTaskManager;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FileBackedTaskManagerTest {
-    private FileBackedTaskManager taskManager;
-
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     @BeforeEach
     void setUp() throws IOException {
         taskManager = new FileBackedTaskManager(File.createTempFile("FileBackedTaskManagerSaveTest", ".csv"));

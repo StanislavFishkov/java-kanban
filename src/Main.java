@@ -23,8 +23,8 @@ public class Main {
         taskManager.addEpic(epic1);
         Subtask subtask1 = new Subtask("Теория", "Изучить всю теорию и пройти все задачи.", epic1.getId());
         taskManager.addSubtask(subtask1);
-        Subtask subtask2 = new Subtask("Финальное задание", "Сдать финальное задание спринта 4.", epic1.getId()
-                , LocalDateTime.of(2024, 1, 10, 10, 0), Duration.ofMinutes(840));
+        Subtask subtask2 = new Subtask("Финальное задание", "Сдать финальное задание спринта 4.", epic1.getId(),
+                LocalDateTime.of(2024, 1, 10, 10, 0), Duration.ofMinutes(840));
         taskManager.addSubtask(subtask2);
 
         taskManager.getTask(task2.getId());
@@ -51,9 +51,9 @@ public class Main {
         Task updateTask1 = new Task(task1.getId(), TaskStatus.DONE, task1.getName(), task1.getDescription());
         taskManager.updateTask(updateTask1);
 
-        Subtask updateSubtask1 = new Subtask(subtask1.getId(), TaskStatus.DONE, subtask1.getName()
-                , subtask1.getDescription(), epic1.getId(), LocalDateTime.of(2024, 3, 10, 20, 0)
-                , Duration.ofMinutes(600));
+        Subtask updateSubtask1 = new Subtask(subtask1.getId(), TaskStatus.DONE, subtask1.getName(),
+                subtask1.getDescription(), epic1.getId(), LocalDateTime.of(2024, 3, 10, 20, 0),
+                Duration.ofMinutes(600));
         taskManager.updateSubtask(updateSubtask1);
 
         Epic updateEpic1 = new Epic(epic1.getId(), epic1.getName() + "!", epic1.getDescription());

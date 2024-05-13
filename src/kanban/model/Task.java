@@ -118,6 +118,7 @@ public class Task {
             return startTime.plus(duration);
         }
     }
+
     public void setId(int id) {
         this.id = id;
     }

@@ -96,7 +96,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    protected void RemoveFromSortedTasks(Task task) {
+    protected void removeFromSortedTasks(Task task) {
         if (task.getStartTime() != null) {
             sortedTasks.remove(task);
         }
@@ -126,7 +126,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllTasks() {
         clearHistory(tasks);
-        tasks.values().forEach(this::RemoveFromSortedTasks);
+        tasks.values().forEach(this::removeFromSortedTasks);
         tasks.clear();
     }
 
@@ -137,14 +137,14 @@ public class InMemoryTaskManager implements TaskManager {
             calculateEpicFields(epic);
         }
         clearHistory(subtasks);
-        subtasks.values().forEach(this::RemoveFromSortedTasks);
+        subtasks.values().forEach(this::removeFromSortedTasks);
         subtasks.clear();
     }
 
     @Override
     public void deleteAllEpics() {
         clearHistory(subtasks);
-        subtasks.values().forEach(this::RemoveFromSortedTasks);
+        subtasks.values().forEach(this::removeFromSortedTasks);
         subtasks.clear();
         clearHistory(epics);
         epics.clear();
@@ -212,7 +212,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (checkForIntersections(task)) return null;
 
         tasks.put(task.getId(), task);
-        RemoveFromSortedTasks(oldTask);
+        removeFromSortedTasks(oldTask);
         addToSortedTasks(task);
         return task;
     }
@@ -236,7 +236,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subtasks.put(subtask.getId(), subtask);
         calculateEpicFields(epic);
-        RemoveFromSortedTasks(oldSubtask);
+        removeFromSortedTasks(oldSubtask);
         addToSortedTasks(subtask);
         return subtask;
     }
@@ -257,7 +257,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTask(Integer id) {
-        RemoveFromSortedTasks(tasks.get(id));
+        removeFromSortedTasks(tasks.get(id));
         tasks.remove(id);
         historyManager.remove(id);
     }
@@ -265,7 +265,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteSubtask(Integer id) {
         Subtask subtask = getSubtask(id);
-        RemoveFromSortedTasks(subtask);
+        removeFromSortedTasks(subtask);
         Epic epic = getEpic(subtask.epic);
         epic.getSubtasks().remove(id);
         subtasks.remove(id);
@@ -276,7 +276,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteEpic(Integer id) {
         for (Integer subtaskId : getEpic(id).getSubtasks()) {
-            RemoveFromSortedTasks(subtasks.get(subtaskId));
+            removeFromSortedTasks(subtasks.get(subtaskId));
             subtasks.remove(subtaskId);
             historyManager.remove(subtaskId);
         }

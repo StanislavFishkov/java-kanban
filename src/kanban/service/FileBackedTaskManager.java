@@ -154,8 +154,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 throw new ManagerSaveException(exception);
             }
 
-            fileBackedTaskManager.getTasks().
-                    forEach(fileBackedTaskManager::addToSortedTasks);
+            fileBackedTaskManager.getTasks()
+                    .forEach(fileBackedTaskManager::addToSortedTasks);
 
             // fill in list of subtasks' ids into its epics
             for (Subtask subtask : fileBackedTaskManager.getSubtasks()) {
@@ -176,8 +176,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
         TaskManager taskManager1 = new FileBackedTaskManager(file);
 
-        taskManager1.addTask(new Task("Task1", "Task1"
-                , LocalDateTime.of(2024, 5, 10, 15, 34), Duration.ofMinutes(90)));
+        taskManager1.addTask(new Task("Task1", "Task1",
+                LocalDateTime.of(2024, 5, 10, 15, 34), Duration.ofMinutes(90)));
         taskManager1.addTask(new Task("Task2", "Task2"));
         Epic epic1 = new Epic("Epic1", "Epic1");
         taskManager1.addEpic(epic1);

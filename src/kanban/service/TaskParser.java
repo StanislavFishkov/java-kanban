@@ -41,8 +41,8 @@ public final class TaskParser {
         switch (taskType) {
             case TASK -> task = new Task(id, taskStatus, name, description, startTime, duration);
             case EPIC -> task = new Epic(id, taskStatus, name, description, startTime, duration);
-            case SUBTASK -> task = new Subtask(id, taskStatus, name, description, Integer.parseInt(strings[5])
-                    , startTime, duration);
+            case SUBTASK -> task = new Subtask(id, taskStatus, name, description, Integer.parseInt(strings[5]),
+                    startTime, duration);
             default -> task = null;
         }
         return task;
