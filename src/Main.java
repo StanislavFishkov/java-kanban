@@ -68,6 +68,11 @@ public class Main {
         System.out.println("Ordered list: " + taskManager.getPrioritizedTasks());
 
         System.out.println("----Вывод 3-----");
+        Epic epic = taskManager.getEpic(epic2.getId());
+        epic.setSubtasks(null);
+        taskManager.updateEpic(epic);
+
+        taskManager.deleteTask(null);
         taskManager.deleteTask(task2.getId());
         taskManager.deleteSubtask(subtask2.getId());
         taskManager.deleteEpic(epic1.getId());
