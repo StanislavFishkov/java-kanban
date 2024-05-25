@@ -1,6 +1,9 @@
 import kanban.model.*;
 import kanban.service.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -20,11 +23,12 @@ public class Main {
         taskManager.addEpic(epic1);
         Subtask subtask1 = new Subtask("Теория", "Изучить всю теорию и пройти все задачи.", epic1.getId());
         taskManager.addSubtask(subtask1);
-        Subtask subtask2 = new Subtask("Финальное задание", "Сдать финальное задание спринта 4.", epic1.getId());
+        Subtask subtask2 = new Subtask("Финальное задание", "Сдать финальное задание спринта 4.", epic1.getId(),
+                LocalDateTime.of(2024, 1, 10, 10, 0), Duration.ofMinutes(840));
         taskManager.addSubtask(subtask2);
 
         taskManager.getTask(task2.getId());
-        System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+        System.out.println("\nHistory (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
 
         Epic epic2 = new Epic();
         epic2.setName("Покупки");
@@ -41,13 +45,15 @@ public class Main {
         System.out.println(taskManager.getSubtasks());
         System.out.println(taskManager.getEpicSubtasks(epic1));
 
-        System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+        System.out.println("\nHistory (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
 
         System.out.println("----Вывод 2-----");
         Task updateTask1 = new Task(task1.getId(), TaskStatus.DONE, task1.getName(), task1.getDescription());
         taskManager.updateTask(updateTask1);
 
-        Subtask updateSubtask1 = new Subtask(subtask1.getId(), TaskStatus.DONE, subtask1.getName(), subtask1.getDescription(), epic2.getId());
+        Subtask updateSubtask1 = new Subtask(subtask1.getId(), TaskStatus.DONE, subtask1.getName(),
+                subtask1.getDescription(), epic1.getId(), LocalDateTime.of(2024, 3, 10, 20, 0),
+                Duration.ofMinutes(600));
         taskManager.updateSubtask(updateSubtask1);
 
         Epic updateEpic1 = new Epic(epic1.getId(), epic1.getName() + "!", epic1.getDescription());
@@ -58,9 +64,15 @@ public class Main {
         System.out.println(taskManager.getSubtasks());
         System.out.println(taskManager.getEpicSubtasks(epic1));
 
-        System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+        System.out.println("\nHistory (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+        System.out.println("Ordered list: " + taskManager.getPrioritizedTasks());
 
         System.out.println("----Вывод 3-----");
+        Epic epic = taskManager.getEpic(epic2.getId());
+        epic.setSubtasks(null);
+        taskManager.updateEpic(epic);
+
+        taskManager.deleteTask(null);
         taskManager.deleteTask(task2.getId());
         taskManager.deleteSubtask(subtask2.getId());
         taskManager.deleteEpic(epic1.getId());
@@ -71,18 +83,22 @@ public class Main {
 
         System.out.println(taskManager.getEpicSubtasks(epic2));
 
-        System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+        System.out.println("\nHistory (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+        System.out.println("Ordered list: " + taskManager.getPrioritizedTasks());
 
         System.out.println("----Вывод 4-----");
         taskManager.deleteAllTasks();
         System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+        System.out.println("Ordered list: " + taskManager.getPrioritizedTasks());
 
         System.out.println("----Вывод 5-----");
         taskManager.deleteAllSubtasks();
         System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+        System.out.println("Ordered list: " + taskManager.getPrioritizedTasks());
 
         System.out.println("----Вывод 6-----");
         taskManager.deleteAllEpics();
         System.out.println("History (size " + taskManager.getHistory().size() + "): " + taskManager.getHistory());
+        System.out.println("Ordered list: " + taskManager.getPrioritizedTasks());
     }
 }

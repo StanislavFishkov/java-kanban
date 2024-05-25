@@ -1,5 +1,8 @@
 package kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     public final Integer epic;
 
@@ -13,8 +16,19 @@ public class Subtask extends Task {
         this.epic = epic;
     }
 
+    public Subtask(String name, String description, Integer epic, LocalDateTime startTime, Duration duration) {
+        super(name, description, startTime, duration);
+        this.epic = epic;
+    }
+
     public Subtask(int id, TaskStatus status, String name, String description, Integer epic) {
         super(id, status, name, description);
+        this.epic = epic;
+    }
+
+    public Subtask(int id, TaskStatus status, String name, String description, Integer epic, LocalDateTime startTime,
+                   Duration duration) {
+        super(id, status, name, description, startTime, duration);
         this.epic = epic;
     }
 
@@ -31,6 +45,9 @@ public class Subtask extends Task {
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", epic.id='" + epic + '\'' +
+                ", startTime='" + getStartTime() + '\'' +
+                ", duration='" + getDuration() + '\'' +
+                ", endTime='" + getEndTime() + '\'' +
                 '}';
     }
 

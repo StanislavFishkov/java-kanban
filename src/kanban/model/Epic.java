@@ -1,9 +1,12 @@
 package kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    protected ArrayList<Integer> subtasks;
+    protected final ArrayList<Integer> subtasks;
+    private LocalDateTime endTime;
 
     public Epic() {
         super();
@@ -12,6 +15,11 @@ public class Epic extends Task {
 
     public Epic(String name, String description) {
         super(name, description);
+        this.subtasks = new ArrayList<>();
+    }
+
+    public Epic(String name, String description, LocalDateTime startTime, Duration duration) {
+        super(name, description, startTime, duration);
         this.subtasks = new ArrayList<>();
     }
 
@@ -25,9 +33,15 @@ public class Epic extends Task {
         this.subtasks = new ArrayList<>();
     }
 
+    public Epic(int id, TaskStatus status, String name, String description, LocalDateTime startTime, Duration duration) {
+        super(id, status, name, description, startTime, duration);
+        this.subtasks = new ArrayList<>();
+    }
+
     public Epic(Epic epic) {
         super(epic);
         this.subtasks = new ArrayList<>(epic.subtasks);
+        this.endTime = epic.getEndTime();
     }
 
     @Override
@@ -38,7 +52,15 @@ public class Epic extends Task {
                 ", name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", subtasks.size='" + subtasks.size() + '\'' +
+                ", startTime='" + getStartTime() + '\'' +
+                ", duration='" + getDuration() + '\'' +
+                ", endTime='" + getEndTime() + '\'' +
                 '}';
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     public ArrayList<Integer> getSubtasks() {
@@ -46,7 +68,13 @@ public class Epic extends Task {
     }
 
     public void setSubtasks(ArrayList<Integer> subtasks) {
-        this.subtasks = subtasks;
+        this.subtasks.clear();
+        if (subtasks == null) return;
+        this.subtasks.addAll(subtasks);
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     @Override

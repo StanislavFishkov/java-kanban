@@ -1,5 +1,7 @@
 package kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,6 +9,8 @@ public class Task {
     private TaskStatus status;
     private String name;
     private String description;
+    private LocalDateTime startTime;
+    private Duration duration;
 
     public Task() {
         this.status = TaskStatus.NEW;
@@ -20,6 +24,14 @@ public class Task {
         this.description = description;
     }
 
+    public Task(String name, String description, LocalDateTime startTime, Duration duration) {
+        this();
+        this.name = name;
+        this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
     public Task(int id, TaskStatus status, String name, String description) {
         this.id = id;
         this.status = status;
@@ -27,11 +39,22 @@ public class Task {
         this.description = description;
     }
 
+    public Task(int id, TaskStatus status, String name, String description, LocalDateTime startTime, Duration duration) {
+        this.id = id;
+        this.status = status;
+        this.name = name;
+        this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
     public Task(Task task) {
         this.id = task.getId();
         this.status = task.getStatus();
         this.name = task.getName();
         this.description = task.getDescription();
+        this.startTime = task.getStartTime();
+        this.duration = task.getDuration();
     }
 
     @Override
@@ -54,6 +77,9 @@ public class Task {
                 ", status=" + status +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", duration='" + duration + '\'' +
+                ", endTime='" + getEndTime() + '\'' +
                 '}';
     }
 
@@ -73,6 +99,26 @@ public class Task {
         return description;
     }
 
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public TaskTypes getTaskType() {
+        return TaskTypes.TASK;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (startTime == null || duration == null) {
+            return null;
+        } else {
+            return startTime.plus(duration);
+        }
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -89,7 +135,11 @@ public class Task {
         this.description = description;
     }
 
-    public TaskTypes getTaskType() {
-        return TaskTypes.TASK;
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
     }
 }
