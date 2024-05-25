@@ -1,3 +1,6 @@
+import kanban.exception.ManagerSaveException;
+import kanban.exception.NotFoundException;
+import kanban.exception.TasksIntersectedException;
 import kanban.model.*;
 import kanban.service.TaskManager;
 
@@ -7,11 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     protected T taskManager;
@@ -91,10 +90,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         assertNotEquals(inMemorySubtask.getId(), epicId, "Добавлен сабтаск с id собственного эпика.");
 
-        subtask = new Subtask(epicId, TaskStatus.NEW, "Test Subtask 2", "Test Subtask 2 desc", epicId);
-        inMemorySubtask = taskManager.updateSubtask(subtask);
+        Subtask subtask1 = new Subtask(epicId, TaskStatus.NEW, "Test Subtask 2", "Test Subtask 2 desc", epicId);
 
-        assertNull(inMemorySubtask, "Обновлен сабтаск с id собственного эпика.");
+        assertThrows(NotFoundException.class, () -> taskManager.updateSubtask(subtask1),
+                "Обновлен сабтаск с id собственного эпика.");
     }
 
     @Test
@@ -111,17 +110,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
         inMemorySubtask = taskManager.addSubtask(subtask);
         assertNull(inMemorySubtask, "Добавлен сабтаск с собственным id в качестве эпика.");
 
-        subtask = new Subtask(subtaskId, TaskStatus.NEW, "Test Subtask 3", "Test Subtask 3 desc", subtaskId);
-        inMemorySubtask = taskManager.updateSubtask(subtask);
-        assertNull(inMemorySubtask, "Обновлен сабтаск с собственным id в качестве эпика.");
+        Subtask subtask1 = new Subtask(subtaskId, TaskStatus.NEW, "Test Subtask 3", "Test Subtask 3 desc", subtaskId);
+        assertThrows(NotFoundException.class, () -> taskManager.updateSubtask(subtask1),
+                "Обновлен сабтаск с собственным id в качестве эпика.");
     }
 
     @Test
     void isNotPossibleToAddTaskByUpdate() {
         Task task = new Task(100, TaskStatus.NEW, "Test Task", "Test task desc");
-        Task savedTask = taskManager.updateTask(task);
 
-        assertNull(savedTask, "Добавлена задача через метод обновления.");
+        assertThrows(NotFoundException.class, () -> taskManager.updateTask(task), "Добавлена задача через метод обновления.");
         assertTrue(taskManager.getTasks().isEmpty(), "Добавлена задача через метод обновления.");
     }
 
@@ -131,18 +129,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
         epic = taskManager.addEpic(epic);
 
         Subtask subtask = new Subtask(100, TaskStatus.NEW, "Test addNewTask", "Test addNewTask description", epic.getId());
-        Subtask savedSubtask = taskManager.updateSubtask(subtask);
 
-        assertNull(savedSubtask, "Добавлен сабтаск через метод обновления.");
+        assertThrows(NotFoundException.class, () -> taskManager.updateSubtask(subtask), "Добавлен сабтаск через метод обновления.");
         assertTrue(taskManager.getSubtasks().isEmpty(), "Добавлен сабтаск через метод обновления.");
     }
 
     @Test
     void isNotPossibleToAddEpicByUpdate() {
         Epic epic = new Epic(100, "Test Epic", "Test Epic description");
-        Epic savedEpic = taskManager.updateEpic(epic);
 
-        assertNull(savedEpic, "Добавлена задача через метод обновления.");
+        assertThrows(NotFoundException.class, () -> taskManager.updateEpic(epic), "Добавлена задача через метод обновления.");
         assertTrue(taskManager.getEpics().isEmpty(), "Добавлена задача через метод обновления.");
     }
 
@@ -190,14 +186,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         Task task = new Task("Task", "Task",
                 LocalDateTime.of(2024, 5, 31, 13, 15), Duration.ofMinutes(100));
-        task = taskManager.addTask(task);
-        assertNull(task, "Возможно добавить задачу с пересекающимся интервалом");
+        assertThrows(TasksIntersectedException.class, () -> taskManager.addTask(task),
+                "Возможно добавить задачу с пересекающимся интервалом");
 
         Subtask subtask4 = taskManager.addSubtask(new Subtask("Subtask4", "Subtask4", epicId));
-        updateSubtask = new Subtask(subtask4);
-        updateSubtask.setStartTime(LocalDateTime.of(2024, 5, 7, 14, 15));
-        updateSubtask.setDuration(Duration.ofMinutes(60));
-        updateSubtask = taskManager.updateSubtask(updateSubtask);
-        assertNull(updateSubtask, "Возможно добавить подзадачу с пересекающимся интервалом");
+        Subtask updateSubtask1 = new Subtask(subtask4);
+        updateSubtask1.setStartTime(LocalDateTime.of(2024, 5, 7, 14, 15));
+        updateSubtask1.setDuration(Duration.ofMinutes(60));
+        assertThrows(TasksIntersectedException.class, () -> taskManager.updateSubtask(updateSubtask1),
+                "Возможно добавить задачу с пересекающимся интервалом");
     }
 }

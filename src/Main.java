@@ -1,3 +1,4 @@
+import kanban.exception.NotFoundException;
 import kanban.model.*;
 import kanban.service.*;
 
@@ -72,7 +73,11 @@ public class Main {
         epic.setSubtasks(null);
         taskManager.updateEpic(epic);
 
-        taskManager.deleteTask(null);
+        try {
+            taskManager.deleteTask(null);
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
         taskManager.deleteTask(task2.getId());
         taskManager.deleteSubtask(subtask2.getId());
         taskManager.deleteEpic(epic1.getId());
