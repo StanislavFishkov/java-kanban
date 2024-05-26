@@ -9,23 +9,23 @@ import org.junit.jupiter.api.BeforeEach;
 import java.io.IOException;
 
 public class HttpTaskServerTest {
-    TaskManager manager;
+    TaskManager taskManager;
     HttpTaskServer taskServer;
     Gson gson;
 
     public HttpTaskServerTest() throws IOException {
         // создаём экземпляр InMemoryTaskManager
-        manager = new InMemoryTaskManager();
+        taskManager = new InMemoryTaskManager();
         // передаём его в качестве аргумента в конструктор HttpTaskServer
-        taskServer = new HttpTaskServer(manager);
+        taskServer = new HttpTaskServer(taskManager);
         gson = taskServer.getGson();
     }
 
     @BeforeEach
     public void setUp() throws IOException {
-        manager.deleteAllTasks();
-        manager.deleteAllSubtasks();
-        manager.deleteAllEpics();
+        taskManager.deleteAllTasks();
+        taskManager.deleteAllSubtasks();
+        taskManager.deleteAllEpics();
         taskServer.start();
     }
 
