@@ -1,7 +1,8 @@
 package kanban.server;
 
 import com.google.gson.reflect.TypeToken;
-import kanban.model.Task;
+import kanban.model.Epic;
+import kanban.model.Subtask;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -15,24 +16,25 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HttpTaskServerTasksTest extends HttpTaskServerTest {
-    static class TaskListTypeToken extends TypeToken<List<Task>> {
+public class HttpTaskServerSubtasksTest extends HttpTaskServerTest {
+    static class SubtasksListTypeToken extends TypeToken<List<Subtask>> {
     }
 
-    public HttpTaskServerTasksTest() throws IOException {
+    public HttpTaskServerSubtasksTest() throws IOException {
         super();
     }
 
     @Test
-    public void testGetTasks() throws IOException, InterruptedException {
+    public void testGetSubtasks() throws IOException, InterruptedException {
         // создаём задачи в менеджере
-        Task task1 = taskManager.addTask(new Task("Test 1", "Testing task 1"));
-        Task task2 = taskManager.addTask(new Task("Test 2", "Testing task 2",
+        Epic epic = taskManager.addEpic(new Epic("Epic", "Epic test"));
+        Subtask subtask1 = taskManager.addSubtask(new Subtask("Test 1", "Testing subtask 1", epic.getId()));
+        Subtask subtask2 = taskManager.addSubtask(new Subtask("Test 2", "Testing subtask 2", epic.getId(),
                 LocalDateTime.of(2024, 12, 1, 15, 12), Duration.ofMinutes(5)));
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks");
+        URI url = URI.create("http://localhost:8080/subtasks");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
 
         // вызываем рест, отвечающий за получение задач
@@ -42,23 +44,24 @@ public class HttpTaskServerTasksTest extends HttpTaskServerTest {
         assertEquals(200, response.statusCode());
 
         // проверяем, что вернулся корректный json
-        assertDoesNotThrow(() -> gson.fromJson(response.body(), new TaskListTypeToken().getType()), "Должен возвращатся корректный json.");
-        List<Task> tasks = gson.fromJson(response.body(), new TaskListTypeToken().getType());
+        assertDoesNotThrow(() -> gson.fromJson(response.body(), new SubtasksListTypeToken().getType()), "Должен возвращатся корректный json.");
+        List<Subtask> subtasks = gson.fromJson(response.body(), new SubtasksListTypeToken().getType());
 
-        assertEquals(2, tasks.size(), "Неверное количество задач.");
+        assertEquals(2, subtasks.size(), "Неверное количество подзадач.");
     }
 
     @Test
-    public void testGetTask() throws IOException, InterruptedException {
+    public void testGetSubtask() throws IOException, InterruptedException {
         // создаём задачу в менеджере
-        Task task = taskManager.addTask(new Task("Test 2", "Testing task 2",
+        Epic epic = taskManager.addEpic(new Epic("Epic", "Epic test"));
+        Subtask subtask = taskManager.addSubtask(new Subtask("Test 2", "Testing subtask 2", epic.getId(),
                 LocalDateTime.of(2024, 12, 1, 15, 12), Duration.ofMinutes(5)));
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
 
         // Создадим URI c некорректным номером
-        URI url = URI.create(String.format("http://localhost:8080/tasks/%s", task.getId() + 1));
+        URI url = URI.create(String.format("http://localhost:8080/subtasks/%s", subtask.getId() + 1));
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
 
         // вызываем рест, отвечающий за получение задачи
@@ -68,7 +71,7 @@ public class HttpTaskServerTasksTest extends HttpTaskServerTest {
         assertEquals(404, responseNotExist.statusCode());
 
         // Создадим URI c корректным номером
-        url = URI.create(String.format("http://localhost:8080/tasks/%s", task.getId()));
+        url = URI.create(String.format("http://localhost:8080/subtasks/%s", subtask.getId()));
         request = HttpRequest.newBuilder().uri(url).GET().build();
 
         // вызываем рест, отвечающий за получение задачи
@@ -78,26 +81,27 @@ public class HttpTaskServerTasksTest extends HttpTaskServerTest {
         assertEquals(200, response.statusCode());
 
         // проверяем, что вернулся корректный json
-        assertDoesNotThrow(() -> gson.fromJson(response.body(), Task.class), "Должен возвращатся корректный json.");
-        Task taskFromRequest = gson.fromJson(response.body(), Task.class);
+        assertDoesNotThrow(() -> gson.fromJson(response.body(), Subtask.class), "Должен возвращатся корректный json.");
+        Subtask subtaskFromRequest = gson.fromJson(response.body(), Subtask.class);
 
-        assertNotNull(taskFromRequest, "Задачи не возвращаются");
-        assertEquals(task, taskFromRequest, "Возвращается не та задача.");
-        assertTrue(task.equalsByAllFields(taskFromRequest), "Задачи содержат разные поля.");
+        assertNotNull(subtaskFromRequest, "Подзадачи не возвращаются");
+        assertEquals(subtask, subtaskFromRequest, "Возвращается не та подзадача.");
+        assertTrue(subtask.equalsByAllFields(subtaskFromRequest), "Подзадачи содержат разные поля.");
     }
 
     @Test
-    public void testPostTask() throws IOException, InterruptedException {
+    public void testPostSubtask() throws IOException, InterruptedException {
         // создаём задачу
-        Task task1 = new Task("Test 1", "Testing task 1",
+        Epic epic = taskManager.addEpic(new Epic("Epic", "Epic test"));
+        Subtask subtask1 = new Subtask("Test 1", "Testing subtask 1", epic.getId(),
                 LocalDateTime.of(2024, 12, 1, 15, 10), Duration.ofMinutes(90));
         // конвертируем её в JSON
-        String taskJson = gson.toJson(task1);
+        String subtaskJson = gson.toJson(subtask1);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks");
-        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        URI url = URI.create("http://localhost:8080/subtasks");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(subtaskJson)).build();
 
         // вызываем рест, отвечающий за создание задач
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -105,20 +109,20 @@ public class HttpTaskServerTasksTest extends HttpTaskServerTest {
         assertEquals(201, response.statusCode());
 
         // проверяем, что создалась одна задача с корректным именем
-        List<Task> tasksFromManager = taskManager.getTasks();
+        List<Subtask> subtasksFromManager = taskManager.getSubtasks();
 
-        assertNotNull(tasksFromManager, "Задачи не возвращаются");
-        assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
-        assertEquals(task1.getName(), tasksFromManager.get(0).getName(), "Некорректное имя задачи");
+        assertNotNull(subtasksFromManager, "Подзадачи не возвращаются");
+        assertEquals(1, subtasksFromManager.size(), "Некорректное количество подзадач");
+        assertEquals(subtask1.getName(), subtasksFromManager.get(0).getName(), "Некорректное имя подзадачи");
 
-        // Попробуем создать задачу с пересекающимся интервалом
+        // Попробуем создать подзадачу с пересекающимся интервалом
         // создаём задачу
-        Task task2 = new Task("Test 2", "Testing task 2",
+        Subtask subtask2 = new Subtask("Test 2", "Testing subtask 2", epic.getId(),
                 LocalDateTime.of(2024, 12, 1, 16, 12), Duration.ofMinutes(5));
         // конвертируем её в JSON
-        taskJson = gson.toJson(task2);
+        subtaskJson = gson.toJson(subtask2);
 
-        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(subtaskJson)).build();
 
         // вызываем рест, отвечающий за создание задач
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -126,12 +130,12 @@ public class HttpTaskServerTasksTest extends HttpTaskServerTest {
         assertEquals(406, response.statusCode());
 
         // Обновим задачу
-        task2.setId(tasksFromManager.get(0).getId());
+        subtask2.setId(subtasksFromManager.get(0).getId());
 
         // конвертируем её в JSON
-        taskJson = gson.toJson(task2);
+        subtaskJson = gson.toJson(subtask2);
 
-        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(subtaskJson)).build();
 
         // вызываем рест, отвечающий за создание задач
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -140,24 +144,25 @@ public class HttpTaskServerTasksTest extends HttpTaskServerTest {
         assertEquals(201, response.statusCode());
 
         // проверяем, что в менеджере так и осталась одна задача, но с другим именем
-        tasksFromManager = taskManager.getTasks();
+        subtasksFromManager = taskManager.getSubtasks();
 
-        assertNotNull(tasksFromManager, "Задачи не возвращаются");
-        assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
-        assertEquals(task2.getName(), tasksFromManager.get(0).getName(), "Некорректное имя задачи");
+        assertNotNull(subtasksFromManager, "Подзадачи не возвращаются");
+        assertEquals(1, subtasksFromManager.size(), "Некорректное количество подзадач");
+        assertEquals(subtask2.getName(), subtasksFromManager.get(0).getName(), "Некорректное имя подзадачи");
     }
 
     @Test
-    public void testDeleteTask() throws IOException, InterruptedException {
+    public void testDeleteSubtask() throws IOException, InterruptedException {
         // создаём задачу в менеджере
-        Task task = taskManager.addTask(new Task("Test 2", "Testing task 2",
+        Epic epic = taskManager.addEpic(new Epic("Epic", "Epic test"));
+        Subtask subtask = taskManager.addSubtask(new Subtask("Test 2", "Testing subtask 2", epic.getId(),
                 LocalDateTime.of(2024, 12, 1, 15, 12), Duration.ofMinutes(5)));
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
 
         // Создадим URI c некорректным номером
-        URI url = URI.create(String.format("http://localhost:8080/tasks/%s", task.getId() + 1));
+        URI url = URI.create(String.format("http://localhost:8080/subtasks/%s", subtask.getId() + 1));
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
 
         // вызываем рест, отвечающий за удаление задачи
@@ -167,7 +172,7 @@ public class HttpTaskServerTasksTest extends HttpTaskServerTest {
         assertEquals(404, responseNotExist.statusCode());
 
         // Создадим URI c корректным номером
-        url = URI.create(String.format("http://localhost:8080/tasks/%s", task.getId()));
+        url = URI.create(String.format("http://localhost:8080/subtasks/%s", subtask.getId()));
         request = HttpRequest.newBuilder().uri(url).DELETE().build();
 
         // вызываем рест, отвечающий за получение задачи
@@ -176,6 +181,6 @@ public class HttpTaskServerTasksTest extends HttpTaskServerTest {
         // проверяем код ответа
         assertEquals(200, response.statusCode());
 
-        assertEquals(0, taskManager.getTasks().size(), "Задача не удалилась.");
+        assertEquals(0, taskManager.getTasks().size(), "Подзадача не удалилась.");
     }
 }
