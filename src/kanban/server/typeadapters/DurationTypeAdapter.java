@@ -1,4 +1,4 @@
-package kanban.server;
+package kanban.server.typeadapters;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

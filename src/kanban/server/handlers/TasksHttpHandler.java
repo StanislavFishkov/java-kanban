@@ -1,10 +1,11 @@
-package kanban.server;
+package kanban.server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import kanban.exception.NotFoundException;
 import kanban.exception.TasksIntersectedException;
 import kanban.model.Task;
+import kanban.server.HttpTaskServer;
 
 import java.io.IOException;
 

@@ -1,6 +1,7 @@
-package kanban.server;
+package kanban.server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
+import kanban.server.HttpTaskServer;
 
 import java.io.IOException;
 
