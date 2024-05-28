@@ -1,5 +1,7 @@
 package kanban.service;
 
+import kanban.exception.NotFoundException;
+import kanban.exception.TasksIntersectedException;
 import kanban.model.Epic;
 import kanban.model.Subtask;
 import kanban.model.Task;
@@ -84,10 +86,12 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private boolean checkForIntersections(Task task) {
-        return getPrioritizedTasks().stream()
+    private void checkForIntersections(Task task) {
+        if (getPrioritizedTasks().stream()
                 .filter(task2 -> !task2.equals(task))
-                .anyMatch(task2 -> areTasksIntersected(task, task2));
+                .anyMatch(task2 -> areTasksIntersected(task, task2))) {
+            throw new TasksIntersectedException("Задача пересекается с другими задачами в менеджере.");
+        }
     }
 
     protected void addToSortedTasks(Task task) {
@@ -152,7 +156,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(Integer id) {
-        if (!tasks.containsKey(id)) return null;
+        if (!tasks.containsKey(id)) throw new NotFoundException(String.format("Нет таска с id: %s", id));
         Task task = tasks.get(id);
         historyManager.add(task);
         return new Task(task);
@@ -160,7 +164,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask getSubtask(Integer id) {
-        if (!subtasks.containsKey(id)) return null;
+        if (!subtasks.containsKey(id)) throw new NotFoundException(String.format("Нет сабтаска с id: %s", id));
         Subtask subtask = subtasks.get(id);
         historyManager.add(subtask);
         return new Subtask(subtask);
@@ -168,7 +172,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpic(Integer id) {
-        if (!epics.containsKey(id)) return null;
+        if (!epics.containsKey(id)) throw new NotFoundException(String.format("Нет эпика с id: %s", id));
         Epic epic = epics.get(id);
         historyManager.add(epic);
         return new Epic(epic);
@@ -177,7 +181,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task addTask(Task task) {
         if (task == null) return null;
-        if (checkForIntersections(task)) return null;
+        checkForIntersections(task);
 
         task.setId(++idCounter);
         tasks.put(idCounter, task);
@@ -190,7 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtask == null) return null;
         Epic epic = epics.get(subtask.epic);
         if (epic == null) return null;
-        if (checkForIntersections(subtask)) return null;
+        checkForIntersections(subtask);
 
         subtask.setId(++idCounter);
         subtasks.put(idCounter, subtask);
@@ -215,8 +219,8 @@ public class InMemoryTaskManager implements TaskManager {
     public Task updateTask(Task task) {
         if (task == null) return null;
         Task oldTask = tasks.get(task.getId());
-        if (oldTask == null) return null;
-        if (checkForIntersections(task)) return null;
+        if (oldTask == null) throw new NotFoundException(String.format("Нет таска с id: %s", task.getId()));
+        checkForIntersections(task);
 
         tasks.put(task.getId(), task);
         removeFromSortedTasks(oldTask);
@@ -228,12 +232,12 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask updateSubtask(Subtask subtask) {
         if (subtask == null) return null;
         Subtask oldSubtask = subtasks.get(subtask.getId());
-        if (oldSubtask == null) return null;
+        if (oldSubtask == null) throw new NotFoundException(String.format("Нет сабтаска с id: %s", subtask.getId()));
 
         Epic epic = epics.get(subtask.epic);
-        if (epic == null) return null;
+        if (epic == null) throw new NotFoundException(String.format("Нет эпика с id: %s", subtask.epic));
         if (subtask.getId().equals(subtask.epic)) return null;
-        if (checkForIntersections(subtask)) return null;
+        checkForIntersections(subtask);
 
         // У подзадачи мог измениться эпик. В этом случае требуются дополнительные действия.
         if (!subtask.epic.equals(oldSubtask.epic)) {
@@ -253,7 +257,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic updateEpic(Epic epic) {
         if (epic == null) return null;
         Epic oldEpic = epics.get(epic.getId());
-        if (oldEpic == null) return null;
+        if (oldEpic == null) throw new NotFoundException(String.format("Нет эпика с id: %s", epic.getId()));
 
         // Перенесем список привязанных подзадач в новый инстанс эпика.
         epic.setSubtasks(epics.get(epic.getId()).getSubtasks());
@@ -264,7 +268,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTask(Integer id) {
-        if (!tasks.containsKey(id)) return;
+        if (!tasks.containsKey(id)) throw new NotFoundException(String.format("Нет таска с id: %s", id));
         removeFromSortedTasks(tasks.get(id));
         tasks.remove(id);
         historyManager.remove(id);
@@ -272,7 +276,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubtask(Integer id) {
-        if (!subtasks.containsKey(id)) return;
+        if (!subtasks.containsKey(id)) throw new NotFoundException(String.format("Нет сабтаска с id: %s", id));
         Subtask subtask = subtasks.get(id);
         removeFromSortedTasks(subtask);
         Epic epic = epics.get(subtask.epic);
@@ -284,7 +288,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteEpic(Integer id) {
-        if (!epics.containsKey(id)) return;
+        if (!epics.containsKey(id)) throw new NotFoundException(String.format("Нет эпика с id: %s", id));
         for (Integer subtaskId : epics.get(id).getSubtasks()) {
             removeFromSortedTasks(subtasks.get(subtaskId));
             subtasks.remove(subtaskId);

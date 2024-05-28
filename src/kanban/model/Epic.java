@@ -3,6 +3,7 @@ package kanban.model;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Epic extends Task {
     protected final ArrayList<Integer> subtasks;
@@ -56,6 +57,12 @@ public class Epic extends Task {
                 ", duration='" + getDuration() + '\'' +
                 ", endTime='" + getEndTime() + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equalsByAllFields(Object o) {
+        return super.equalsByAllFields(o) && Objects.equals(endTime, ((Epic) o).endTime)
+                && Objects.equals(subtasks, ((Epic) o).subtasks);
     }
 
     @Override

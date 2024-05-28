@@ -2,6 +2,7 @@ package kanban.model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class Subtask extends Task {
     public final Integer epic;
@@ -49,6 +50,11 @@ public class Subtask extends Task {
                 ", duration='" + getDuration() + '\'' +
                 ", endTime='" + getEndTime() + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equalsByAllFields(Object o) {
+        return super.equalsByAllFields(o) && Objects.equals(epic, ((Subtask) o).epic);
     }
 
     @Override
